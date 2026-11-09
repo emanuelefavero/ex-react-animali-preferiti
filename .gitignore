@@ -1,0 +1,10 @@
+# Mac OS
+.DS_Store
+
+# Agents
+.agents/
+.playwright-mcp
+.playwright-cli
+
+# Local files
+.local/

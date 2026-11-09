@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:3333
+@resource = animals
+@animalName = Zebra
+@id = 1
+
+# Animal data example:
+# {
+#   "id": 1,
+#   "name": "Lion",
+#   "description": "The lion is a large and powerful wild cat.",
+#   "diet": "Carnivore",
+#   "family": "Felidae",
+#   "habitat": "Grasslands and Savannas",
+#   "height_cm": 120,
+#   "weight_kg": 190,
+#   "species": "Panthera leo",
+#   "place_of_found": "Africa",
+#   "image": "https://fakeimg.pl/500x500/cc6601"
+# }
+
+### index
+GET {{baseUrl}}/{{resource}}/
+# Response: Animal[]
+
+### index + search
+GET {{baseUrl}}/{{resource}}?search={{animalName}}
+# Response: Animal[]
+
+### show
+GET {{baseUrl}}/{{resource}}/{{id}}
+# Response: Animal
