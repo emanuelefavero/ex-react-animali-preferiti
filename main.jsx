@@ -60,23 +60,35 @@ const Modal = ({
   confirmDisabled = false,
   onClose = () => {},
   onConfirm = () => {},
-}) =>
-  show &&
-  createPortal(
-    <div className='modal-container'>
-      <div className='modal'>
-        <h2>{title}</h2>
-        <div>{content}</div>
-        <div>
-          <button onClick={onClose}>Annulla</button>
-          <button onClick={onConfirm} disabled={confirmDisabled}>
-            Conferma
-          </button>
+}) => {
+  useEffect(() => {
+    if (!show) return;
+
+    // Close modal on Esc key press
+    const handleKeyDown = e => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [show, onClose]);
+
+  return (
+    show &&
+    createPortal(
+      <div className='modal-container'>
+        <div className='modal'>
+          <h2>{title}</h2>
+          <div>{content}</div>
+          <div>
+            <button onClick={onClose}>Annulla</button>
+            <button onClick={onConfirm} disabled={confirmDisabled}>
+              Conferma
+            </button>
+          </div>
         </div>
-      </div>
-    </div>,
-    document.body,
+      </div>,
+      document.body,
+    )
   );
+};
 
 const AnimalList = () => {
   const [animals, setAnimals] = useState([]);
