@@ -1,41 +1,90 @@
 const { useState } = React;
-const { createRoot } = ReactDOM;
+const { createRoot, createPortal } = ReactDOM;
 
-const animalsChoices = ['Cane', 'Gatto', 'Pappagallo', 'Cavallo', 'Panda'];
+const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+
+const Modal = ({
+  title,
+  content,
+  show = false,
+  onClose = () => {},
+  onConfirm = () => {},
+}) =>
+  show &&
+  createPortal(
+    <div className='modal-container'>
+      <div className='modal'>
+        <h2>{title}</h2>
+        <div>{content}</div>
+        <div>
+          <button onClick={onClose}>Annulla</button>
+          <button onClick={onConfirm}>Conferma</button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
 
 const AnimalList = () => {
   const [animals, setAnimals] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [input, setInput] = useState('');
 
-  // Filter out animals that have already been added to the list
-  const availableChoices = animalsChoices.filter(
-    choice => !animals.includes(choice),
-  );
-  const allAnimalsAdded = availableChoices.length === 0;
+  const toggleModal = () => setShowModal(!showModal);
 
-  const addAnimal = () => {
-    const randomIndex = Math.floor(Math.random() * availableChoices.length);
-    const randomAnimal = availableChoices[randomIndex];
+  const handleAddAnimal = () => {
+    const trimmedInput = input.trim();
 
-    return setAnimals(prev => [...prev, randomAnimal]);
+    if (!trimmedInput) return;
+
+    setAnimals([...animals, capitalize(trimmedInput)]);
+    setInput('');
+    setShowModal(false);
   };
 
-  return (
-    <>
-      <button type='button' onClick={addAnimal} disabled={allAnimalsAdded}>
-        {allAnimalsAdded ? 'Animali Aggiunti' : 'Aggiungi Animale'}
-      </button>
+  const inputElement = (
+    <input
+      type='text'
+      name='animal'
+      value={input}
+      onChange={e => setInput(e.target.value)}
+      placeholder='Cane'
+    />
+  );
 
-      <details>
-        <summary>Animali</summary>
-        {!animals.length && <p>Nessun animale aggiunto</p>}
+  const getAnimalsList = () => {
+    switch (animals.length) {
+      case 0:
+        return <p>Nessun animale aggiunto</p>;
 
-        {animals && (
+      default:
+        return (
           <ul>
             {animals.map(animal => (
               <li key={animal}>{animal}</li>
             ))}
           </ul>
-        )}
+        );
+    }
+  };
+
+  return (
+    <>
+      <button type='button' onClick={toggleModal}>
+        Aggiungi Animale
+      </button>
+
+      <Modal
+        title={'Aggiungi Animale'}
+        content={inputElement}
+        show={showModal}
+        onClose={toggleModal}
+        onConfirm={handleAddAnimal}
+      />
+
+      <details>
+        <summary>Animali</summary>
+        {getAnimalsList()}
       </details>
     </>
   );
