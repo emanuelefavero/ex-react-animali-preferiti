@@ -25,6 +25,7 @@ const searchAnimal = async animalName => {
   if (!animal) return null;
 
   return {
+    id: animal.id,
     name: animal.name,
     description: animal.description || 'Descrizione non disponibile',
     image: animal.image || DEFAULT_ANIMAL_IMAGE,
@@ -99,16 +100,27 @@ const AnimalList = () => {
   const [showModal, setShowModal] = useState(false);
   const [input, setInput] = useState('');
   const [searchState, setSearchState] = useState({ step: 'idle' });
-  const canConfirm = searchState.step === 'success' && searchState.data?.name;
   const inputRef = useRef(null);
 
+  // Check if the animal is already added to the list
+  const isAlreadyAdded =
+    searchState.step === 'success' &&
+    animals.some(animal => animal.id === searchState.data?.id);
+
+  // confirm button should be enabled only if the search was successful, the animal has a name, and it is not already added
+  const canConfirm =
+    searchState.step === 'success' &&
+    Boolean(searchState.data?.name) &&
+    !isAlreadyAdded;
+
+  // Perform a search for the animal when the input changes and the modal is open
   useEffect(() => {
     if (!showModal || !input.trim()) {
       setSearchState({ step: 'idle' });
       return;
     }
 
-    let ignore = false;
+    let ignore = false; // flag to ignore results if unmounts or input changes
 
     const loadAnimal = async () => {
       setSearchState({ step: 'loading' });
@@ -167,12 +179,7 @@ const AnimalList = () => {
   const handleAddAnimal = () => {
     if (!canConfirm) return;
 
-    const animal = {
-      id: crypto.randomUUID(),
-      ...searchState.data,
-    };
-
-    setAnimals([...animals, animal]);
+    setAnimals([...animals, searchState.data]);
     closeModal();
   };
 
@@ -186,10 +193,16 @@ const AnimalList = () => {
         return <p>{searchState.error}</p>;
 
       case 'success':
+        if (isAlreadyAdded) {
+          return <p>Animale già aggiunto</p>;
+        }
+
+        const { data: animal } = searchState;
+
         return (
           <p>
-            {searchState.data?.name
-              ? `Animale trovato: ${searchState.data.name}`
+            {animal?.name
+              ? `Animale trovato: ${animal.name}`
               : 'Animale non trovato'}
           </p>
         );
