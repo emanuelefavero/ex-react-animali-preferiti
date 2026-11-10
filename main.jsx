@@ -1,29 +1,44 @@
+const { useState } = React;
 const { createRoot } = ReactDOM;
 
-const animals = [
-  'Lion',
-  'Giraffe',
-  'Elephant',
-  'Zebra',
-  'Cheetah',
-  'Leopard',
-  'Hyena',
-  'Gazelle',
-  'Flamingo',
-].sort((a, b) => a.localeCompare(b));
+const animalsChoices = ['Cane', 'Gatto', 'Pappagallo', 'Cavallo', 'Panda'];
 
-const AnimalList = ({ animals }) =>
-  animals.length > 0 && (
-    <details>
-      <summary>Animali</summary>
-      <ul>
-        {animals.map(animal => (
-          <li key={animal}>{animal}</li>
-        ))}
-      </ul>
-    </details>
+const AnimalList = () => {
+  const [animals, setAnimals] = useState([]);
+
+  // Filter out animals that have already been added to the list
+  const availableChoices = animalsChoices.filter(
+    choice => !animals.includes(choice),
   );
+  const allAnimalsAdded = availableChoices.length === 0;
 
-createRoot(document.querySelector('.lista-animali')).render(
-  <AnimalList animals={animals} />,
-);
+  const addAnimal = () => {
+    const randomIndex = Math.floor(Math.random() * availableChoices.length);
+    const randomAnimal = availableChoices[randomIndex];
+
+    return setAnimals(prev => [...prev, randomAnimal]);
+  };
+
+  return (
+    <>
+      <button type='button' onClick={addAnimal} disabled={allAnimalsAdded}>
+        {allAnimalsAdded ? 'Animali Aggiunti' : 'Aggiungi Animale'}
+      </button>
+
+      <details>
+        <summary>Animali</summary>
+        {!animals.length && <p>Nessun animale aggiunto</p>}
+
+        {animals && (
+          <ul>
+            {animals.map(animal => (
+              <li key={animal}>{animal}</li>
+            ))}
+          </ul>
+        )}
+      </details>
+    </>
+  );
+};
+
+createRoot(document.querySelector('.lista-animali')).render(<AnimalList />);
