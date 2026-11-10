@@ -5,6 +5,7 @@ const { createRoot, createPortal } = ReactDOM;
 const BASE_URL = 'http://localhost:3333';
 const RESOURCE = 'animals';
 const URL = `${BASE_URL}/${RESOURCE}`;
+const DEFAULT_ANIMAL_IMAGE = './assets/img/animal-placeholder.svg';
 
 // API
 const fetchJson = async url => {
@@ -26,18 +27,31 @@ const searchAnimal = async animalName => {
   return {
     name: animal.name,
     description: animal.description || 'Descrizione non disponibile',
-    image: animal.image || 'https://picsum.photos/500/500',
+    image: animal.image || DEFAULT_ANIMAL_IMAGE,
   };
 };
 
 // COMPONENTS
-const AnimalCard = ({ animal }) => (
-  <article>
-    <h2>{animal.name}</h2>
-    <p>{animal.description}</p>
-    <img src={animal.image} alt={animal.name} />
-  </article>
-);
+const AnimalCard = ({ animal }) => {
+  const [hasImageError, setHasImageError] = useState(false);
+  const image = hasImageError ? DEFAULT_ANIMAL_IMAGE : animal.image;
+
+  return (
+    <article>
+      <h2>{animal.name}</h2>
+      <p>{animal.description}</p>
+      <img
+        src={image}
+        alt={
+          image === DEFAULT_ANIMAL_IMAGE
+            ? `Immagine non disponibile per ${animal.name}`
+            : animal.name
+        }
+        onError={() => setHasImageError(true)}
+      />
+    </article>
+  );
+};
 
 const Modal = ({
   title,
