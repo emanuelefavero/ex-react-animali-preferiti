@@ -103,10 +103,12 @@ const AnimalList = () => {
       }
     };
 
-    loadAnimal();
+    // Debounce search by 400ms
+    const timeoutId = setTimeout(loadAnimal, 400);
 
     return () => {
       ignore = true;
+      clearTimeout(timeoutId);
     };
   }, [input, showModal]);
 
@@ -176,6 +178,7 @@ const AnimalList = () => {
         onChange={handleInputChange}
         placeholder='Zebra'
         ref={inputRef}
+        autoComplete='off'
       />
 
       {getSearchContent()}
