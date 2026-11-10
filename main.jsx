@@ -73,7 +73,11 @@ const Modal = ({
   return (
     show &&
     createPortal(
-      <div className='modal-container'>
+      <div
+        className='modal-container'
+        // Close modal when clicking outside of it
+        onClick={e => e.target === e.currentTarget && onClose()}
+      >
         <div className='modal'>
           <h2>{title}</h2>
           <div>{content}</div>
